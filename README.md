@@ -1,8 +1,13 @@
 # Kimai Timer
 
-A small Android app that shows your running [Kimai](https://www.kimai.org) timer in a notification, also on the lock
-screen: a clock ticking in HH:MM:SS with project, activity, customer and description, and a Stop button. After a stop
-from the notification, the card offers Restart for 15 minutes. Tapping it opens Kimai (its installed web app, if any).
+An Android app for [Kimai](https://www.kimai.org) in two parts:
+
+- **Kimai itself**: the app opens your Kimai's web interface, with its login, its plugins and everything else, so it
+  replaces Kimai's web app installed from the browser. Links to other sites open in the browser, exports go to
+  Downloads, file fields open Android's file picker.
+- **The running timer in a notification, also on the lock screen**: a clock ticking in HH:MM:SS with project,
+  activity, customer and description, and a Stop button. After a stop from the notification, the card offers Restart
+  for 15 minutes. Tapping it opens Kimai in the app.
 
 ![The running timer on the lock screen](screenshots/lock-screen.webp)
 
@@ -19,10 +24,15 @@ The APK is attached to each [release](https://github.com/6801318d8d/kimai-timer/
 ## Setup
 
 1. In Kimai, create an API token: your profile → API access.
-2. In the app, enter the Kimai address and the token, then "Save and connect", and allow notifications.
+2. At the first start the app opens its settings: enter the Kimai address and the token, then "Save and connect", and
+   allow notifications. Going back shows Kimai: log in there once (tick "remember me" to stay logged in).
 3. On Xiaomi/HyperOS phones also turn on Autostart and allow the notifications on the lock screen (App settings).
 
-The token stays in the app's private storage; the app talks only to your Kimai.
+Settings later: long press on the app icon → Settings. The token (for the notification) and the login session (for
+the web interface) stay in the app's private storage; the app talks only to your Kimai.
+
+Downloads that the web page starts with a form (POST) or from JavaScript cannot go through Android's download manager:
+for those, open Kimai in the browser.
 
 ## How changes made elsewhere arrive
 
@@ -70,7 +80,8 @@ decryption; AppPushBundle's messages carry no data and arrive unencrypted).
 
 | File | Role |
 | --- | --- |
-| `MainActivity.kt` | Setup and status screen |
+| `MainActivity.kt` | Kimai's web interface (WebView): login, links, downloads, file picker, back navigation |
+| `SettingsActivity.kt` | Settings and status screen |
 | `TimerNotification.kt` | The notification, one layout for every state: running, stopping, starting, stopped, idle |
 | `SyncWorker.kt` | All API calls, in the background: refresh, Stop, Restart, endpoint registration |
 | `Delivery.kt` | The modes: picks UnifiedPush or the direct connection and starts or stops them |

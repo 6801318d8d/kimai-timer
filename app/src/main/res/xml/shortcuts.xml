@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Long press on the app icon: the settings (the main screen is Kimai itself) -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:icon="@drawable/ic_settings"
+        android:shortcutId="settings"
+        android:shortcutLongLabel="@string/settings_title"
+        android:shortcutShortLabel="@string/settings_short">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="io.github.x6801318d8d.kimaitimer.SettingsActivity"
+            android:targetPackage="io.github.x6801318d8d.kimaitimer" />
+    </shortcut>
+</shortcuts>

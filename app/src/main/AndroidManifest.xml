@@ -31,16 +31,28 @@
         android:theme="@android:style/Theme.DeviceDefault.DayNight"
         android:usesCleartextTraffic="true">
 
+        <!-- Kimai's web interface; the page survives rotations and keyboard changes without reloading -->
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|uiMode"
             android:exported="true"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.KimaiTimer.NoActionBar"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="true"
+            android:label="@string/settings_title"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- UnifiedPush: new endpoint and messages from the distributor -->
         <service

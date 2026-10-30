@@ -10,6 +10,13 @@
     <string name="idle_title">Nessun timer in corso</string>
     <string name="idle_last">Ultimo: %1$s (%2$s)</string>
 
+    <string name="settings_title">Impostazioni di Kimai Timer</string>
+    <string name="settings_short">Impostazioni</string>
+    <string name="retry">Riprova</string>
+    <string name="web_error">Kimai (%1$s) non è raggiungibile: %2$s</string>
+    <string name="downloading">Download di %1$s…</string>
+    <string name="download_unsupported">Questo file non si può scaricare dall\'app: aprire Kimai nel browser</string>
+
     <string name="intro">Mostra il timer di Kimai in corso in una notifica, anche sulla schermata di blocco.</string>
     <string name="url_hint">Indirizzo di Kimai, es. https://kimai.example.com</string>
     <string name="token_hint">Token API (Kimai: Profilo → Accesso API)</string>

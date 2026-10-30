@@ -83,6 +83,9 @@ class KimaiApi(private val url: String, private val token: String) {
 
     private fun request(method: String, path: String, body: JSONObject? = null): String {
         val connection = open(method, path)
+        // the app calls the API only now and then: a connection kept open for reuse would only let the server's TCP
+        // keep-alive packets (Caddy: every 15 s) wake the phone until it closes
+        connection.setRequestProperty("Connection", "close")
         try {
             if (body != null) {
                 connection.doOutput = true

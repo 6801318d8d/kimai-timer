@@ -51,6 +51,18 @@ object Delivery {
     }
 
     /**
+     * At each opening of the app: UnifiedPush gets another chance (a distributor may have been installed or fixed),
+     * updates are set up again and the timer is read.
+     */
+    fun start(context: Context) {
+        val settings = Settings(context)
+        if (!settings.configured) return
+        settings.pushError = ""
+        apply(context, register = true)
+        SyncWorker.enqueue(context, SyncWorker.REFRESH)
+    }
+
+    /**
      * Starts what the current mode needs and stops the rest. [register]: also (re)register with the distributor,
      * as UnifiedPush asks apps to do at each start (the distributor answers with the same endpoint).
      */

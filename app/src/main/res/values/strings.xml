@@ -12,6 +12,13 @@
     <string name="idle_title">No timer running</string>
     <string name="idle_last">Last: %1$s (%2$s)</string>
 
+    <string name="settings_title">Kimai Timer settings</string>
+    <string name="settings_short">Settings</string>
+    <string name="retry">Try again</string>
+    <string name="web_error">Kimai (%1$s) cannot be reached: %2$s</string>
+    <string name="downloading">Downloading %1$s…</string>
+    <string name="download_unsupported">This file cannot be downloaded from the app: open Kimai in the browser</string>
+
     <string name="intro">Shows the running Kimai timer in a notification, also on the lock screen.</string>
     <string name="url_hint">Kimai address, e.g. https://kimai.example.com</string>
     <string name="token_hint">API token (Kimai: Profile → API access)</string>

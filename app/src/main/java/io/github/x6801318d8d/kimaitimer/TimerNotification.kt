@@ -8,7 +8,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.SystemClock
 import android.view.View
 import android.widget.RemoteViews
@@ -176,14 +175,9 @@ object TimerNotification {
         return key to builder.build()
     }
 
-    /** Tapping the notification opens Kimai (its installed web app, if any, takes the link). */
+    /** Tapping the notification opens Kimai in the app. */
     private fun openKimai(context: Context): PendingIntent {
-        val url = Settings(context).url
-        val intent = if (url.isEmpty()) {
-            Intent(context, MainActivity::class.java)
-        } else {
-            Intent(Intent.ACTION_VIEW, Uri.parse("$url/"))
-        }.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val intent = Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
