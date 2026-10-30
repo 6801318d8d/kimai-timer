@@ -57,8 +57,8 @@ To configure a phone from a computer without typing the token on it (only the ad
 the receiver requires `android.permission.DUMP`):
 
 ```sh
-adb shell am broadcast -n io.github.x6801318d8d.kimaitimer/.SetupReceiver --es url https://kimai.example.com --es token <token> [--es mode auto|unifiedpush|direct|periodic]
-adb shell am start -S -n io.github.x6801318d8d.kimaitimer/.MainActivity
+adb shell am broadcast -n io.github.x6801318d8d.timer/io.github.x6801318d8d.kimaitimer.SetupReceiver --es url https://kimai.example.com --es token <token> [--es mode auto|unifiedpush|direct|periodic]
+adb shell am start -S -n io.github.x6801318d8d.timer/io.github.x6801318d8d.kimaitimer.MainActivity
 ```
 
 ## Build

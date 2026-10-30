@@ -9,6 +9,6 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetClass="io.github.x6801318d8d.kimaitimer.SettingsActivity"
-            android:targetPackage="io.github.x6801318d8d.kimaitimer" />
+            android:targetPackage="io.github.x6801318d8d.timer" />
     </shortcut>
 </shortcuts>

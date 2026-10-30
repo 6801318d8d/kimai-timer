@@ -15,11 +15,13 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "io.github.x6801318d8d.kimaitimer"
+        // without "kimai": WebView sends the application id in X-Requested-With, and Kimai treats any request whose
+        // X-Requested-With contains "kimai" as one of its own JavaScript requests (403 instead of the login page)
+        applicationId = "io.github.x6801318d8d.timer"
         minSdk = 31
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 4
+        versionName = "1.2.0"
     }
 
     signingConfigs {

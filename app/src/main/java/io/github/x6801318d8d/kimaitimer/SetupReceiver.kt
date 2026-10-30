@@ -7,7 +7,7 @@ import android.content.Intent
 /**
  * Setup from a computer over adb, so the token need not be typed on the phone:
  *
- *     adb shell am broadcast -n io.github.x6801318d8d.kimaitimer/.SetupReceiver --es url https://kimai.example.com --es token <token>
+ *     adb shell am broadcast -n io.github.x6801318d8d.timer/io.github.x6801318d8d.kimaitimer.SetupReceiver --es url https://kimai.example.com --es token <token>
  *
  * then open the app. Optional extra "mode": auto, unifiedpush, direct or periodic. Only the adb shell and the system
  * can send it: the receiver requires android.permission.DUMP, which apps cannot get.
