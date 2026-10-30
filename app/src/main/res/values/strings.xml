@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Kimai Timer</string>
+
+    <string name="channel_timer">Running timer</string>
+    <string name="channel_timer_description">The running Kimai timer, also on the lock screen</string>
+    <string name="stop">Stop</string>
+    <string name="restart">Restart</string>
+    <string name="stopping">Stopping…</string>
+    <string name="starting">Starting…</string>
+    <string name="stopped">Stopped</string>
+    <string name="idle_title">No timer running</string>
+    <string name="idle_last">Last: %1$s (%2$s)</string>
+
+    <string name="intro">Shows the running Kimai timer in a notification, also on the lock screen.</string>
+    <string name="url_hint">Kimai address, e.g. https://kimai.example.com</string>
+    <string name="token_hint">API token (Kimai: Profile → API access)</string>
+    <string name="save">Save and connect</string>
+    <string name="updates">Timers started or stopped elsewhere arrive</string>
+    <string name="mode_auto">Automatically (recommended): UnifiedPush if available, else direct connection</string>
+    <string name="mode_unifiedpush">Through UnifiedPush (ntfy, NextPush, Sunup…)</string>
+    <string name="mode_direct">Through a direct connection to Kimai (notification always shown)</string>
+    <string name="mode_periodic">Every 15 minutes only</string>
+    <string name="choose_distributor">UnifiedPush distributor</string>
+    <string name="battery">Allow the connection in the background</string>
+    <string name="refresh">Check now</string>
+    <string name="app_settings">App settings (autostart, lock screen)</string>
+    <string name="help">On Xiaomi phones also turn on Autostart and allow the notifications on the lock screen in the app settings.</string>
+
+    <string name="connecting">Connecting…</string>
+    <string name="connected_as">Connected as %1$s</string>
+    <string name="error_url">The address must start with https:// (or http://)</string>
+    <string name="error_connection">Connection failed: %1$s</string>
+    <string name="error_push_refused">Kimai refused the push endpoint (%1$s)</string>
+    <string name="error_background_start">The direct connection could not start in the background: allow it in the app</string>
+    <string name="no_distributor">No UnifiedPush distributor installed</string>
+    <string name="no_distributor_help">No UnifiedPush distributor is installed. Install one (ntfy, NextPush, Sunup…) or use the direct connection.</string>
+
+    <string name="status_not_configured">Enter the Kimai address and an API token.</string>
+    <string name="status_running">Running: %1$s since %2$s</string>
+    <string name="status_idle">No timer running</string>
+    <string name="status_last_check">Last check: %1$s</string>
+    <string name="status_push_on">Updates: instant, through %1$s</string>
+    <string name="status_push_pending">Updates: registering with %1$s…</string>
+    <string name="status_push_failed">UnifiedPush not usable: %1$s</string>
+    <string name="status_direct_connected">Updates: instant, direct connection open</string>
+    <string name="status_direct_connecting">Updates: direct connection, connecting…</string>
+    <string name="status_battery">The system may close the connection: allow it in the background</string>
+    <string name="status_periodic">Updates: every 15 minutes</string>
+    <string name="status_notifications_off">Notifications are turned off for this app</string>
+    <string name="status_error">Last error: %1$s</string>
+</resources>

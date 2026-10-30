@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="channel_timer">Timer in corso</string>
+    <string name="channel_timer_description">Il timer di Kimai in corso, anche sulla schermata di blocco</string>
+    <string name="stop">Ferma</string>
+    <string name="restart">Riavvia</string>
+    <string name="stopping">Arresto…</string>
+    <string name="starting">Avvio…</string>
+    <string name="stopped">Fermato</string>
+    <string name="idle_title">Nessun timer in corso</string>
+    <string name="idle_last">Ultimo: %1$s (%2$s)</string>
+
+    <string name="intro">Mostra il timer di Kimai in corso in una notifica, anche sulla schermata di blocco.</string>
+    <string name="url_hint">Indirizzo di Kimai, es. https://kimai.example.com</string>
+    <string name="token_hint">Token API (Kimai: Profilo → Accesso API)</string>
+    <string name="save">Salva e collega</string>
+    <string name="updates">I timer avviati o fermati altrove arrivano</string>
+    <string name="mode_auto">In automatico (consigliato): UnifiedPush se disponibile, altrimenti collegamento diretto</string>
+    <string name="mode_unifiedpush">Tramite UnifiedPush (ntfy, NextPush, Sunup…)</string>
+    <string name="mode_direct">Tramite un collegamento diretto a Kimai (notifica sempre presente)</string>
+    <string name="mode_periodic">Solo ogni 15 minuti</string>
+    <string name="choose_distributor">Distributore UnifiedPush</string>
+    <string name="battery">Consenti il collegamento in background</string>
+    <string name="refresh">Controlla ora</string>
+    <string name="app_settings">Impostazioni dell\'app (avvio automatico, schermata di blocco)</string>
+    <string name="help">Sui telefoni Xiaomi attivare anche l\'avvio automatico e consentire le notifiche sulla schermata di blocco nelle impostazioni dell\'app.</string>
+
+    <string name="connecting">Collegamento…</string>
+    <string name="connected_as">Collegato come %1$s</string>
+    <string name="error_url">L\'indirizzo deve iniziare con https:// (o http://)</string>
+    <string name="error_connection">Collegamento non riuscito: %1$s</string>
+    <string name="error_push_refused">Kimai ha rifiutato l\'endpoint push (%1$s)</string>
+    <string name="error_background_start">Il collegamento diretto non è partito in background: consentirlo nell\'app</string>
+    <string name="no_distributor">Nessun distributore UnifiedPush installato</string>
+    <string name="no_distributor_help">Non è installato nessun distributore UnifiedPush. Installarne uno (ntfy, NextPush, Sunup…) oppure usare il collegamento diretto.</string>
+
+    <string name="status_not_configured">Inserire l\'indirizzo di Kimai e un token API.</string>
+    <string name="status_running">In corso: %1$s dalle %2$s</string>
+    <string name="status_idle">Nessun timer in corso</string>
+    <string name="status_last_check">Ultimo controllo: %1$s</string>
+    <string name="status_push_on">Aggiornamenti: immediati, tramite %1$s</string>
+    <string name="status_push_pending">Aggiornamenti: registrazione presso %1$s…</string>
+    <string name="status_push_failed">UnifiedPush non utilizzabile: %1$s</string>
+    <string name="status_direct_connected">Aggiornamenti: immediati, collegamento diretto aperto</string>
+    <string name="status_direct_connecting">Aggiornamenti: collegamento diretto in corso…</string>
+    <string name="status_battery">Il sistema può chiudere il collegamento: consentirlo in background</string>
+    <string name="status_periodic">Aggiornamenti: ogni 15 minuti</string>
+    <string name="status_notifications_off">Le notifiche di questa app sono disattivate</string>
+    <string name="status_error">Ultimo errore: %1$s</string>
+</resources>
