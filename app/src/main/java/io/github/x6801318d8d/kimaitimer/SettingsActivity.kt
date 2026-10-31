@@ -71,7 +71,7 @@ class SettingsActivity : Activity() {
             }
         }
         findViewById<Button>(R.id.save).setOnClickListener { save() }
-        findViewById<Button>(R.id.refresh).setOnClickListener { SyncWorker.enqueue(this, SyncWorker.REFRESH) }
+        findViewById<Button>(R.id.refresh).setOnClickListener { SyncWorker.enqueue(this, SyncWorker.SYNC, catalog = true) }
         distributorButton.setOnClickListener { chooseDistributor() }
         batteryButton.setOnClickListener { askBatteryExemption() }
         findViewById<Button>(R.id.app_settings).setOnClickListener {
@@ -105,28 +105,47 @@ class SettingsActivity : Activity() {
         }
         status.text = getString(R.string.connecting)
         thread {
-            val result = runCatching { KimaiApi(newUrl, newToken).me() }
+            val result = runCatching { KimaiApi(newUrl, newToken).user() }
             runOnUiThread {
                 result.onSuccess { user ->
-                    val changed = newUrl != settings.url || newToken != settings.token
-                    settings.url = newUrl
-                    settings.token = newToken
-                    settings.lastError = ""
-                    settings.pushError = ""
-                    if (changed) {
-                        settings.endpointRegistered = false
+                    val waiting = Tracker.read(this).changes.size
+                    if (settings.url.isNotEmpty() && newUrl != settings.url && waiting > 0) {
+                        // the ids in the queue belong to the old Kimai: only the user knows whether it is the same one
+                        AlertDialog.Builder(this)
+                            .setMessage(resources.getQuantityString(R.plurals.address_changed, waiting, waiting))
+                            .setPositiveButton(R.string.address_changed_send) { _, _ -> connected(newUrl, newToken, user) }
+                            .setNegativeButton(R.string.address_changed_discard) { _, _ ->
+                                Tracker.update(this) { Local(nextId = it.nextId) }
+                                connected(newUrl, newToken, user)
+                            }
+                            .setCancelable(false)
+                            .show()
+                    } else {
+                        connected(newUrl, newToken, user)
                     }
-                    Delivery.apply(this, register = true)
-                    if (changed && settings.endpoint.isNotEmpty()) {
-                        SyncWorker.enqueue(this, SyncWorker.REGISTER)
-                    }
-                    SyncWorker.enqueue(this, SyncWorker.REFRESH)
-                    status.text = getString(R.string.connected_as, user)
                 }.onFailure {
                     status.text = getString(R.string.error_connection, it.message ?: it.javaClass.simpleName)
                 }
             }
         }
+    }
+
+    private fun connected(newUrl: String, newToken: String, user: KimaiApi.User) {
+        val changed = newUrl != settings.url || newToken != settings.token
+        settings.url = newUrl
+        settings.token = newToken
+        settings.timezone = user.timezone
+        settings.lastError = ""
+        settings.pushError = ""
+        if (changed) {
+            settings.endpointRegistered = false
+        }
+        Delivery.apply(this, register = true)
+        if (changed && settings.endpoint.isNotEmpty()) {
+            SyncWorker.enqueue(this, SyncWorker.REGISTER)
+        }
+        SyncWorker.enqueue(this, SyncWorker.SYNC, catalog = true)
+        status.text = getString(R.string.connected_as, user.name)
     }
 
     private fun chooseDistributor() {
@@ -166,11 +185,15 @@ class SettingsActivity : Activity() {
             return
         }
         val lines = mutableListOf<String>()
-        val running = settings.running
+        val local = Tracker.read(this)
+        val running = local.running
         lines += if (running != null) {
             getString(R.string.status_running, running.title, DateFormat.format("HH:mm:ss", running.begin))
         } else {
             getString(R.string.status_idle)
+        }
+        if (local.changes.isNotEmpty()) {
+            lines += resources.getQuantityString(R.plurals.waiting, local.changes.size, local.changes.size)
         }
         if (settings.lastSync > 0) {
             lines += getString(R.string.status_last_check, DateFormat.format("yyyy-MM-dd HH:mm:ss", settings.lastSync))
@@ -197,6 +220,7 @@ class SettingsActivity : Activity() {
         if (settings.lastError.isNotEmpty()) {
             lines += getString(R.string.status_error, settings.lastError)
         }
+        lines += settings.refused.map { getString(R.string.status_refused, it) }
         status.text = lines.joinToString("\n")
     }
 }

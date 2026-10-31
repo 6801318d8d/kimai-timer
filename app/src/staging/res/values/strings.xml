@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- the staging build installs next to the release one: tell them apart -->
+<resources>
+    <string name="app_name" translatable="false">Kimai Timer (test)</string>
+</resources>

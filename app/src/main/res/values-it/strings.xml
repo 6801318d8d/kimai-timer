@@ -4,11 +4,39 @@
     <string name="channel_timer_description">Il timer di Kimai in corso, anche sulla schermata di blocco</string>
     <string name="stop">Ferma</string>
     <string name="restart">Riavvia</string>
-    <string name="stopping">Arresto…</string>
-    <string name="starting">Avvio…</string>
     <string name="stopped">Fermato</string>
     <string name="idle_title">Nessun timer in corso</string>
     <string name="idle_last">Ultimo: %1$s (%2$s)</string>
+
+    <string name="unreachable">Kimai non raggiungibile</string>
+    <plurals name="waiting">
+        <item quantity="one">%d modifica in attesa di Kimai</item>
+        <item quantity="other">%d modifiche in attesa di Kimai</item>
+        <item quantity="many">%d modifiche in attesa di Kimai</item>
+    </plurals>
+
+    <string name="channel_refused">Modifiche rifiutate da Kimai</string>
+    <string name="channel_refused_description">Un timer avviato o fermato nell\'app che Kimai non ha accettato</string>
+    <plurals name="refused_title">
+        <item quantity="one">Kimai ha rifiutato una modifica</item>
+        <item quantity="other">Kimai ha rifiutato %d modifiche</item>
+        <item quantity="many">Kimai ha rifiutato %d modifiche</item>
+    </plurals>
+    <string name="refused_start">%1$s, %2$s: %3$s</string>
+    <string name="refused_stop">Arresto di %1$s alle %2$s: %3$s</string>
+    <string name="refused_hint">Inserirla in Kimai a mano.</string>
+
+    <string name="panel_offline">Il timer funziona comunque qui: ciò che si avvia e si ferma arriva a Kimai, con i suoi orari, quando Kimai torna raggiungibile.</string>
+    <string name="panel_not_answering">Kimai (%1$s) non risponde.</string>
+    <string name="panel_no_network">Nessuna connessione di rete.</string>
+    <string name="panel_start_title">Avvia un timer</string>
+    <string name="panel_project">Progetto</string>
+    <string name="panel_activity">Attività</string>
+    <string name="panel_description">Descrizione (facoltativa)</string>
+    <string name="panel_start">Avvia</string>
+    <string name="panel_no_catalog">I progetti e le attività arrivano con il prossimo collegamento a Kimai.</string>
+    <string name="panel_recent">Ultime registrazioni (toccarne una per compilare il modulo)</string>
+    <string name="panel_waiting">in attesa</string>
 
     <string name="settings_title">Impostazioni di Kimai Timer</string>
     <string name="settings_short">Impostazioni</string>
@@ -54,4 +82,12 @@
     <string name="status_periodic">Aggiornamenti: ogni 15 minuti</string>
     <string name="status_notifications_off">Le notifiche di questa app sono disattivate</string>
     <string name="status_error">Ultimo errore: %1$s</string>
+    <string name="status_refused">Rifiutata da Kimai: %1$s</string>
+    <plurals name="address_changed">
+        <item quantity="one">%d modifica fatta nell\'app attende ancora il vecchio indirizzo. Il nuovo indirizzo è lo stesso Kimai?</item>
+        <item quantity="other">%d modifiche fatte nell\'app attendono ancora il vecchio indirizzo. Il nuovo indirizzo è lo stesso Kimai?</item>
+        <item quantity="many">%d modifiche fatte nell\'app attendono ancora il vecchio indirizzo. Il nuovo indirizzo è lo stesso Kimai?</item>
+    </plurals>
+    <string name="address_changed_send">Stesso Kimai: inviarle</string>
+    <string name="address_changed_discard">Un altro Kimai: scartarle</string>
 </resources>

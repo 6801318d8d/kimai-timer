@@ -72,7 +72,7 @@ class StreamService : Service() {
                         delay = MIN_DELAY
                     }
                     // "ready" too: catch up with what changed while the connection was down
-                    SyncWorker.enqueue(this, SyncWorker.REFRESH)
+                    SyncWorker.enqueue(this, SyncWorker.SYNC)
                 }
                 settings.streamConnected = false
                 // the server ends each stream after half an hour: reconnect at once (but not in a loop if it

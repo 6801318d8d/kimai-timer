@@ -20,7 +20,7 @@ class PushService : org.unifiedpush.android.connector.PushService() {
     }
 
     override fun onMessage(message: PushMessage, instance: String) {
-        SyncWorker.enqueue(this, SyncWorker.REFRESH)
+        SyncWorker.enqueue(this, SyncWorker.SYNC)
     }
 
     override fun onRegistrationFailed(reason: FailedReason, instance: String) {

@@ -12,7 +12,7 @@ class BootReceiver : BroadcastReceiver() {
             if (Settings(context).configured) {
                 TimerNotification.createChannel(context)
                 Delivery.apply(context, register = false)
-                SyncWorker.enqueue(context, SyncWorker.REFRESH)
+                SyncWorker.enqueue(context, SyncWorker.SYNC)
             }
         }
     }

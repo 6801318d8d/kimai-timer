@@ -52,14 +52,14 @@ object Delivery {
 
     /**
      * At each opening of the app: UnifiedPush gets another chance (a distributor may have been installed or fixed),
-     * updates are set up again and the timer is read.
+     * updates are set up again, waiting changes are sent and the timer, projects and activities are read.
      */
     fun start(context: Context) {
         val settings = Settings(context)
         if (!settings.configured) return
         settings.pushError = ""
         apply(context, register = true)
-        SyncWorker.enqueue(context, SyncWorker.REFRESH)
+        SyncWorker.enqueue(context, SyncWorker.SYNC, catalog = true)
     }
 
     /**

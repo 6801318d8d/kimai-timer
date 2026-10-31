@@ -20,8 +20,8 @@ android {
         applicationId = "io.github.x6801318d8d.timer"
         minSdk = 31
         targetSdk = 36
-        versionCode = 4
-        versionName = "1.2.0"
+        versionCode = 5
+        versionName = "1.3.0"
     }
 
     signingConfigs {
@@ -42,6 +42,13 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
             signingConfig = signingConfigs.getByName(if (keystore != null) "release" else "debug")
         }
+        // the release build under another application id, installed next to the real one with its own settings: for
+        // tests against another Kimai (Play Protect blocks apps signed with the debug key)
+        create("staging") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".test"
+            versionNameSuffix = "-test"
+        }
     }
 
     compileOptions {
@@ -54,4 +61,8 @@ dependencies {
     implementation("androidx.core:core:1.18.0")
     implementation("androidx.work:work-runtime:2.11.2")
     implementation("org.unifiedpush.android:connector:3.3.5")
+
+    testImplementation("junit:junit:4.13.2")
+    // Android's org.json is only a stub in local unit tests
+    testImplementation("org.json:json:20250517")
 }

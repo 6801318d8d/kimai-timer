@@ -7,6 +7,7 @@ import android.app.DownloadManager
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -18,26 +19,35 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import android.window.OnBackInvokedDispatcher
+import kotlin.concurrent.thread
 
 /**
  * Kimai itself: the web interface of the configured Kimai in a WebView, with its login, its plugins and everything
  * else, so that the app replaces Kimai's installed web app. Links to other sites open in the browser, downloads go
  * through Android's download manager, file inputs open Android's file picker. Settings: the app shortcut (long press
- * on the icon), or the button shown when Kimai cannot be reached.
+ * on the icon), or the button of the timer screen.
+ *
+ * While Kimai cannot be reached, the app's own timer screen ([TimerPanel]) takes the place of the page: at once if
+ * the last sync failed or there is no network, after a quick check if Kimai is slow to answer (a server that is off
+ * can keep the page loading for a minute or two), and when the page fails.
  */
 class MainActivity : Activity() {
     private lateinit var settings: Settings
     private lateinit var web: WebView
-    private lateinit var error: View
-    private lateinit var errorText: TextView
+    private lateinit var panel: TimerPanel
     private var loadedUrl = ""
     private var fileCallback: ValueCallback<Array<Uri>>? = null
+    /** The current page loaded without errors / failed (no answer, or a proxy's 5xx in Kimai's place). */
+    private var pageLoaded = false
+    private var pageFailed = false
+    /** Counts the loads, so that a slow check of an older load does nothing. */
+    private var loads = 0
 
     @SuppressLint("SetJavaScriptEnabled") // Kimai's interface needs JavaScript; only the user's own Kimai is loaded
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,9 +55,11 @@ class MainActivity : Activity() {
         setContentView(R.layout.activity_main)
         settings = Settings(this)
         web = findViewById(R.id.web)
-        error = findViewById(R.id.error)
-        errorText = findViewById(R.id.error_text)
-        findViewById<Button>(R.id.retry).setOnClickListener { load() }
+        panel = TimerPanel(this, findViewById(R.id.panel))
+        findViewById<Button>(R.id.retry).setOnClickListener {
+            load()
+            SyncWorker.enqueue(this, SyncWorker.SYNC)
+        }
         findViewById<Button>(R.id.open_settings).setOnClickListener { openSettings() }
         TimerNotification.createChannel(this)
 
@@ -65,12 +77,24 @@ class MainActivity : Activity() {
                 return true
             }
 
+            override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+                pageFailed = false
+            }
+
             override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
-                if (request.isForMainFrame) showError(error.description.toString())
+                if (request.isForMainFrame) failed(error.description.toString())
+            }
+
+            override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, response: WebResourceResponse) {
+                // a proxy answering for a Kimai that is down (502, 503, 504)
+                if (request.isForMainFrame && response.statusCode >= 500) failed("HTTP ${response.statusCode}")
             }
 
             override fun onPageFinished(view: WebView, url: String) {
                 CookieManager.getInstance().flush()
+                if (pageFailed) return
+                pageLoaded = true
+                if (panel.visible && panel.automatic && !panel.touched) hidePanel()
             }
         }
         web.webChromeClient = object : WebChromeClient() {
@@ -108,12 +132,14 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         web.onResume()
+        panel.resume()
         // the address was set or changed in the settings
         if (settings.configured && settings.url != loadedUrl) load()
     }
 
     override fun onPause() {
         web.onPause()
+        panel.pause()
         CookieManager.getInstance().flush()
         super.onPause()
     }
@@ -140,21 +166,47 @@ class MainActivity : Activity() {
     }
 
     private fun back() {
-        if (error.visibility == View.GONE && web.canGoBack()) web.goBack() else finish()
+        when {
+            panel.visible && pageLoaded -> hidePanel()
+            !panel.visible && web.canGoBack() -> web.goBack()
+            else -> finish()
+        }
     }
 
     private fun load() {
         if (!settings.configured) return
         loadedUrl = settings.url
-        error.visibility = View.GONE
-        web.visibility = View.VISIBLE
+        pageLoaded = false
+        pageFailed = false
+        hidePanel()
         web.loadUrl("$loadedUrl/")
+        if (settings.unreachable || !Tracker.online(this)) showPanel(notAnswering(), automatic = true)
+        val load = ++loads
+        val api = settings.api() ?: return
+        thread {
+            val up = api.reachable()
+            runOnUiThread {
+                if (!up && load == loads && !pageLoaded && !isDestroyed) showPanel(notAnswering(), automatic = true)
+            }
+        }
     }
 
-    private fun showError(description: String) {
-        errorText.text = getString(R.string.web_error, settings.url, description)
+    private fun failed(description: String) {
+        pageFailed = true
+        showPanel(if (Tracker.online(this)) getString(R.string.web_error, settings.url, description) else notAnswering(), automatic = false)
+    }
+
+    private fun notAnswering(): String =
+        if (Tracker.online(this)) getString(R.string.panel_not_answering, settings.url) else getString(R.string.panel_no_network)
+
+    private fun showPanel(text: String, automatic: Boolean) {
+        panel.show(text, automatic)
         web.visibility = View.GONE
-        error.visibility = View.VISIBLE
+    }
+
+    private fun hidePanel() {
+        panel.hide()
+        web.visibility = View.VISIBLE
     }
 
     private fun openSettings() {
