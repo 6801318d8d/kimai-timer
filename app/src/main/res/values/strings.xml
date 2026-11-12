@@ -47,7 +47,7 @@
 
     <string name="intro">Shows the running Kimai timer in a notification, also on the lock screen.</string>
     <string name="url_hint">Kimai address, e.g. https://kimai.example.com</string>
-    <string name="token_hint">API token (Kimai: Profile → API access)</string>
+    <string name="token_hint">API token (leave empty: the app creates one when you log in)</string>
     <string name="save">Save and connect</string>
     <string name="updates">Timers started or stopped elsewhere arrive</string>
     <string name="mode_auto">Automatically (recommended): UnifiedPush if available, else direct connection</string>
@@ -64,12 +64,14 @@
     <string name="connected_as">Connected as %1$s</string>
     <string name="error_url">The address must start with https:// (or http://)</string>
     <string name="error_connection">Connection failed: %1$s</string>
+    <string name="token_created">Connected as %1$s: the app created its API token in Kimai</string>
+    <string name="token_failed">The app could not create its API token: %1$s. Enter one in the settings (Kimai: Profile → API access).</string>
     <string name="error_push_refused">Kimai refused the push endpoint (%1$s)</string>
     <string name="error_background_start">The direct connection could not start in the background: allow it in the app</string>
     <string name="no_distributor">No UnifiedPush distributor installed</string>
     <string name="no_distributor_help">No UnifiedPush distributor is installed. Install one (ntfy, NextPush, Sunup…) or use the direct connection.</string>
 
-    <string name="status_not_configured">Enter the Kimai address and an API token.</string>
+    <string name="status_not_configured">Enter the Kimai address, tap “Save and connect” and log in to Kimai: the app then creates its own API token. Or enter a token (Kimai: Profile → API access).</string>
     <string name="status_running">Running: %1$s since %2$s</string>
     <string name="status_idle">No timer running</string>
     <string name="status_last_check">Last check: %1$s</string>

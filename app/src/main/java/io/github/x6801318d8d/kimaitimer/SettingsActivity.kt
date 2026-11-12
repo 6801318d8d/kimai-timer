@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -24,7 +25,10 @@ import androidx.core.app.NotificationManagerCompat
 import org.unifiedpush.android.connector.UnifiedPush
 import kotlin.concurrent.thread
 
-/** Settings and status: Kimai address and API token, how updates arrive, permissions. */
+/**
+ * Settings and status: Kimai address and API token, how updates arrive, permissions. Without a token, "Save and
+ * connect" opens Kimai's page, where the app creates its own token once the user has logged in.
+ */
 class SettingsActivity : Activity() {
     private lateinit var settings: Settings
     private lateinit var url: EditText
@@ -103,25 +107,18 @@ class SettingsActivity : Activity() {
             status.text = getString(R.string.error_url)
             return
         }
+        if (newToken.isEmpty()) {
+            confirmAddress(newUrl) { logIn(newUrl) }
+            return
+        }
         status.text = getString(R.string.connecting)
         thread {
             val result = runCatching { KimaiApi(newUrl, newToken).user() }
             runOnUiThread {
                 result.onSuccess { user ->
-                    val waiting = Tracker.read(this).changes.size
-                    if (settings.url.isNotEmpty() && newUrl != settings.url && waiting > 0) {
-                        // the ids in the queue belong to the old Kimai: only the user knows whether it is the same one
-                        AlertDialog.Builder(this)
-                            .setMessage(resources.getQuantityString(R.plurals.address_changed, waiting, waiting))
-                            .setPositiveButton(R.string.address_changed_send) { _, _ -> connected(newUrl, newToken, user) }
-                            .setNegativeButton(R.string.address_changed_discard) { _, _ ->
-                                Tracker.update(this) { Local(nextId = it.nextId) }
-                                connected(newUrl, newToken, user)
-                            }
-                            .setCancelable(false)
-                            .show()
-                    } else {
-                        connected(newUrl, newToken, user)
+                    confirmAddress(newUrl) {
+                        connected(this, newUrl, newToken, user)
+                        status.text = getString(R.string.connected_as, user.name)
                     }
                 }.onFailure {
                     status.text = getString(R.string.error_connection, it.message ?: it.javaClass.simpleName)
@@ -130,22 +127,33 @@ class SettingsActivity : Activity() {
         }
     }
 
-    private fun connected(newUrl: String, newToken: String, user: KimaiApi.User) {
-        val changed = newUrl != settings.url || newToken != settings.token
-        settings.url = newUrl
-        settings.token = newToken
-        settings.timezone = user.timezone
-        settings.lastError = ""
-        settings.pushError = ""
-        if (changed) {
+    /** The ids in the queue belong to the old Kimai: only the user knows whether the new address is the same one. */
+    private fun confirmAddress(newUrl: String, then: () -> Unit) {
+        val waiting = Tracker.read(this).changes.size
+        if (settings.url.isEmpty() || newUrl == settings.url || waiting == 0) return then()
+        AlertDialog.Builder(this)
+            .setMessage(resources.getQuantityString(R.plurals.address_changed, waiting, waiting))
+            .setPositiveButton(R.string.address_changed_send) { _, _ -> then() }
+            .setNegativeButton(R.string.address_changed_discard) { _, _ ->
+                Tracker.update(this) { Local(nextId = it.nextId) }
+                then()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    /** No token: Kimai's page opens, and once the user is logged in the app creates its own token ([WebToken]). */
+    private fun logIn(newUrl: String) {
+        if (newUrl != settings.url || settings.token.isNotEmpty()) {
+            settings.url = newUrl
+            settings.token = ""
             settings.endpointRegistered = false
+            settings.lastError = ""
+            settings.pushError = ""
+            Delivery.apply(this, register = false)
         }
-        Delivery.apply(this, register = true)
-        if (changed && settings.endpoint.isNotEmpty()) {
-            SyncWorker.enqueue(this, SyncWorker.REGISTER)
-        }
-        SyncWorker.enqueue(this, SyncWorker.SYNC, catalog = true)
-        status.text = getString(R.string.connected_as, user.name)
+        startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+        finish()
     }
 
     private fun chooseDistributor() {
@@ -181,7 +189,10 @@ class SettingsActivity : Activity() {
         distributorButton.visibility = if (mode == Delivery.UNIFIEDPUSH || Delivery.distributors(this).size > 1) View.VISIBLE else View.GONE
         batteryButton.visibility = if (mode == Delivery.DIRECT && !exempt) View.VISIBLE else View.GONE
         if (!settings.configured) {
-            status.text = getString(R.string.status_not_configured)
+            status.text = listOfNotNull(
+                getString(R.string.status_not_configured),
+                settings.lastError.takeIf { it.isNotEmpty() }?.let { getString(R.string.status_error, it) },
+            ).joinToString("\n")
             return
         }
         val lines = mutableListOf<String>()
@@ -222,5 +233,26 @@ class SettingsActivity : Activity() {
         }
         lines += settings.refused.map { getString(R.string.status_refused, it) }
         status.text = lines.joinToString("\n")
+    }
+
+    companion object {
+        /** A token that works for [newUrl]: save both and start updates and syncs ("Save and connect", [WebToken]). */
+        fun connected(context: Context, newUrl: String, newToken: String, user: KimaiApi.User) {
+            val settings = Settings(context)
+            val changed = newUrl != settings.url || newToken != settings.token
+            settings.url = newUrl
+            settings.token = newToken
+            settings.timezone = user.timezone
+            settings.lastError = ""
+            settings.pushError = ""
+            if (changed) {
+                settings.endpointRegistered = false
+            }
+            Delivery.apply(context, register = true)
+            if (changed && settings.endpoint.isNotEmpty()) {
+                SyncWorker.enqueue(context, SyncWorker.REGISTER)
+            }
+            SyncWorker.enqueue(context, SyncWorker.SYNC, catalog = true)
+        }
     }
 }

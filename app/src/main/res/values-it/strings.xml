@@ -47,7 +47,7 @@
 
     <string name="intro">Mostra il timer di Kimai in corso in una notifica, anche sulla schermata di blocco.</string>
     <string name="url_hint">Indirizzo di Kimai, es. https://kimai.example.com</string>
-    <string name="token_hint">Token API (Kimai: Profilo → Accesso API)</string>
+    <string name="token_hint">Token API (lasciare vuoto: l\'app ne crea uno quando si accede)</string>
     <string name="save">Salva e collega</string>
     <string name="updates">I timer avviati o fermati altrove arrivano</string>
     <string name="mode_auto">In automatico (consigliato): UnifiedPush se disponibile, altrimenti collegamento diretto</string>
@@ -64,12 +64,14 @@
     <string name="connected_as">Collegato come %1$s</string>
     <string name="error_url">L\'indirizzo deve iniziare con https:// (o http://)</string>
     <string name="error_connection">Collegamento non riuscito: %1$s</string>
+    <string name="token_created">Collegato come %1$s: l\'app ha creato il suo token API in Kimai</string>
+    <string name="token_failed">L\'app non è riuscita a creare il suo token API: %1$s. Inserirne uno nelle impostazioni (Kimai: Profilo → Accesso API).</string>
     <string name="error_push_refused">Kimai ha rifiutato l\'endpoint push (%1$s)</string>
     <string name="error_background_start">Il collegamento diretto non è partito in background: consentirlo nell\'app</string>
     <string name="no_distributor">Nessun distributore UnifiedPush installato</string>
     <string name="no_distributor_help">Non è installato nessun distributore UnifiedPush. Installarne uno (ntfy, NextPush, Sunup…) oppure usare il collegamento diretto.</string>
 
-    <string name="status_not_configured">Inserire l\'indirizzo di Kimai e un token API.</string>
+    <string name="status_not_configured">Inserire l\'indirizzo di Kimai, toccare “Salva e collega” e accedere a Kimai: l\'app crea poi da sé il suo token API. Oppure inserire un token (Kimai: Profilo → Accesso API).</string>
     <string name="status_running">In corso: %1$s dalle %2$s</string>
     <string name="status_idle">Nessun timer in corso</string>
     <string name="status_last_check">Ultimo controllo: %1$s</string>

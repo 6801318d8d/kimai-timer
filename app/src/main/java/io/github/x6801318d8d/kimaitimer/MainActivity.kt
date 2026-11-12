@@ -29,7 +29,8 @@ import kotlin.concurrent.thread
 
 /**
  * Kimai itself: the web interface of the configured Kimai in a WebView, with its login, its plugins and everything
- * else, so that the app replaces Kimai's installed web app. Links to other sites open in the browser, downloads go
+ * else, so that the app replaces Kimai's installed web app. Without an API token, the app creates its own once the
+ * user has logged in here. Links to other sites open in the browser, downloads go
  * through Android's download manager, file inputs open Android's file picker. Settings: the app shortcut (long press
  * on the icon), or the button of the timer screen.
  *
@@ -48,6 +49,8 @@ class MainActivity : Activity() {
     private var pageFailed = false
     /** Counts the loads, so that a slow check of an older load does nothing. */
     private var loads = 0
+    /** The app already tried to create its API token for this load ([createToken]). */
+    private var tokenTried = false
 
     @SuppressLint("SetJavaScriptEnabled") // Kimai's interface needs JavaScript; only the user's own Kimai is loaded
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,6 +98,7 @@ class MainActivity : Activity() {
                 if (pageFailed) return
                 pageLoaded = true
                 if (panel.visible && panel.automatic && !panel.touched) hidePanel()
+                createToken(url)
             }
         }
         web.webChromeClient = object : WebChromeClient() {
@@ -119,7 +123,7 @@ class MainActivity : Activity() {
             }
         }
 
-        if (!settings.configured) {
+        if (settings.url.isEmpty()) {
             openSettings()
         } else if (savedInstanceState != null && web.restoreState(savedInstanceState) != null) {
             loadedUrl = settings.url
@@ -133,8 +137,13 @@ class MainActivity : Activity() {
         super.onResume()
         web.onResume()
         panel.resume()
-        // the address was set or changed in the settings
-        if (settings.configured && settings.url != loadedUrl) load()
+        // the address was set or changed in the settings; or the token was removed there, with Kimai's page open
+        if (settings.url.isNotEmpty() && settings.url != loadedUrl) {
+            load()
+        } else if (pageLoaded && settings.token.isEmpty()) {
+            tokenTried = false
+            web.url?.let { createToken(it) }
+        }
     }
 
     override fun onPause() {
@@ -174,7 +183,8 @@ class MainActivity : Activity() {
     }
 
     private fun load() {
-        if (!settings.configured) return
+        if (settings.url.isEmpty()) return
+        tokenTried = false
         loadedUrl = settings.url
         pageLoaded = false
         pageFailed = false
@@ -187,6 +197,41 @@ class MainActivity : Activity() {
             val up = api.reachable()
             runOnUiThread {
                 if (!up && load == loads && !pageLoaded && !isDestroyed) showPanel(notAnswering(), automatic = true)
+            }
+        }
+    }
+
+    /**
+     * No API token yet: once a Kimai page other than the login is open, the user is logged in and the app creates its
+     * own token through the web interface ([WebToken]). One try per load or return to the app (from the settings,
+     * say), except when the session turns out not to be logged in, which waits for the next page.
+     */
+    private fun createToken(pageUrl: String) {
+        if (settings.token.isNotEmpty() || tokenTried || !isKimai(Uri.parse(pageUrl)) || pageUrl.contains("/login")) return
+        tokenTried = true
+        val kimai = settings.url
+        val agent = web.settings.userAgentString
+        val name = getString(R.string.app_name) + " (" + Build.MODEL + ")"
+        thread {
+            val result = runCatching {
+                val token = WebToken(kimai, agent).create(name)
+                token to KimaiApi(kimai, token).user()
+            }
+            runOnUiThread {
+                result.onSuccess { (token, user) ->
+                    // the address may have changed meanwhile: the token belongs to the old one
+                    if (settings.url != kimai || settings.token.isNotEmpty()) return@onSuccess
+                    SettingsActivity.connected(applicationContext, kimai, token, user)
+                    Toast.makeText(this, getString(R.string.token_created, user.name), Toast.LENGTH_LONG).show()
+                }.onFailure {
+                    if (it is WebToken.NotLoggedIn) {
+                        tokenTried = false
+                        return@onFailure
+                    }
+                    val message = getString(R.string.token_failed, it.message ?: it.javaClass.simpleName)
+                    settings.lastError = message
+                    Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

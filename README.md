@@ -48,10 +48,18 @@ The APK is attached to each [release](https://github.com/6801318d8d/kimai-timer/
 
 ## Setup
 
-1. In Kimai, create an API token: your profile → API access.
-2. At the first start the app opens its settings: enter the Kimai address and the token, then "Save and connect", and
-   allow notifications. Going back shows Kimai: log in there once (tick "remember me" to stay logged in).
+1. At the first start the app opens its settings: enter the Kimai address, tap "Save and connect" and allow
+   notifications.
+2. Kimai's login page opens: log in. The app then creates its own API token in Kimai, "Kimai Timer (device model)"
+   under your profile → API access, and the notification starts.
 3. On Xiaomi/HyperOS phones also turn on Autostart and allow the notifications on the lock screen (App settings).
+
+Why a token as well as the login: the notification works in the background through Kimai's API, which takes only API
+tokens, while the web interface uses the login session. The app makes the token through the web interface, right
+after the login, as you would by hand (Kimai wants a fresh login there, not one restored by "remember me"). To use a
+token of your own instead, paste it in the settings before "Save and connect"; emptying the field and "Save and
+connect" makes the app create a new one. A user whom Kimai does not allow to create API tokens needs one made by an
+administrator.
 
 Settings later: long press on the app icon → Settings. The token (for the notification) and the login session (for
 the web interface) stay in the app's private storage; the app talks only to your Kimai.
@@ -85,6 +93,8 @@ the receiver requires `android.permission.DUMP`):
 adb shell am broadcast -n io.github.x6801318d8d.timer/io.github.x6801318d8d.kimaitimer.SetupReceiver --es url https://kimai.example.com --es token <token> [--es mode auto|unifiedpush|direct|periodic]
 adb shell am start -S -n io.github.x6801318d8d.timer/io.github.x6801318d8d.kimaitimer.MainActivity
 ```
+
+Without `--es token`, the app opens Kimai's login page and creates its token after the login, as in the normal setup.
 
 ## Build
 
@@ -123,6 +133,7 @@ decryption; AppPushBundle's messages carry no data and arrive unencrypted).
 | `PushService.kt` | UnifiedPush endpoint and messages |
 | `StreamService.kt` | The direct connection (foreground service, type specialUse) |
 | `KimaiApi.kt` | Kimai's REST API and AppPushBundle |
+| `WebToken.kt` | Creates the app's API token through Kimai's web interface, with the WebView's login |
 | `ActionReceiver.kt`, `BootReceiver.kt`, `SetupReceiver.kt` | Notification buttons and redraws; boot and update; setup over adb |
 
 Android's Chronometer formats MM:SS below one hour and H:MM:SS above, so the leading zeros go in its format string
